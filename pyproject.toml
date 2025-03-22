@@ -1,8 +1,30 @@
 [project]
 name = "coteach-ai"
 version = "0.1.0"
-description = "Add your description here"
+description = "A multi-agent AI system that transforms simple course ideas into fully structured educational experiences through automated research and intelligent content organization."
 requires-python = ">=3.13"
+authors = [
+    { name = "Vetrichelvan", email = "pythonhubdev@gmail.com" }
+]
 dependencies = [
     "litestar>=2.15.1",
 ]
+
+[dependency-groups]
+development = [
+    "mypy>=1.15.0",
+    "pre-commit>=4.2.0",
+    "pyright>=1.1.397",
+    "ruff>=0.11.2",
+]
+
+[tool.uv]
+package = true
+
+[tool.mypy]
+files = [
+    "src/"
+]
+
+[tool.pyright]
+exclude = ["tests", ".venv"]
