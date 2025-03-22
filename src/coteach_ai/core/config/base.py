@@ -27,16 +27,16 @@ class Environment(str, Enum):
 
 
 ENV_FILE_MAP = {
-		Environment.DEVELOPMENT: ".env.development",
-		Environment.TESTING    : ".env.testing",
+	Environment.DEVELOPMENT: ".env.development",
+	Environment.TESTING: ".env.testing",
 }
 
 GRANIAN_LOG_MAPPING = {
-		"INFO"    : LogLevels.info,
-		"DEBUG"   : LogLevels.debug,
-		"WARNING" : LogLevels.warning,
-		"ERROR"   : LogLevels.error,
-		"CRITICAL": LogLevels.critical,
+	"INFO": LogLevels.info,
+	"DEBUG": LogLevels.debug,
+	"WARNING": LogLevels.warning,
+	"ERROR": LogLevels.error,
+	"CRITICAL": LogLevels.critical,
 }
 
 
@@ -80,7 +80,7 @@ class AppSettings:
 	DEBUG: bool = field(default_factory=lambda: os.getenv("LITESTAR_DEBUG", "False") in TRUE_VALUES)
 	"""Run `Litestar` with `debug=True`."""
 	SECRET_KEY: str = field(
-			default_factory=lambda: os.getenv("SECRET_KEY", binascii.hexlify(os.urandom(32)).decode(encoding="utf-8")),
+		default_factory=lambda: os.getenv("SECRET_KEY", binascii.hexlify(os.urandom(32)).decode(encoding="utf-8")),
 	)
 	"""Application secret key."""
 	NAME: str = field(default_factory=lambda: os.getenv("APP_NAME", "CoTeach AI"))
@@ -115,7 +115,7 @@ class ServerSettings:
 	"""Server configurations."""
 
 	APP_LOC: str = field(
-			default_factory=lambda: os.getenv("LITESTAR_APP_LOC", "src.coteach_ai.api.application:app"),
+		default_factory=lambda: os.getenv("LITESTAR_APP_LOC", "src.coteach_ai.api.application:app"),
 	)
 	"""Path to app executable, or factory."""
 	HOST: str = field(default_factory=lambda: os.getenv("LITESTAR_HOST", "0.0.0.0"))
@@ -128,9 +128,9 @@ class ServerSettings:
 	RELOAD_DIRS: list[str] = field(default_factory=lambda: [f"{BASE_DIR}"])
 	"""Directories to watch for reloading."""
 	HTTP_WORKERS: int = field(
-			default_factory=lambda: int(os.getenv("WEB_CONCURRENCY"))  # type: ignore[arg-type]
-			if os.getenv("WEB_CONCURRENCY") is not None
-			else 1,
+		default_factory=lambda: int(os.getenv("WEB_CONCURRENCY"))  # type: ignore[arg-type]
+		if os.getenv("WEB_CONCURRENCY") is not None
+		else 1,
 	)
 	"""Number of HTTP Worker processes to be spawned by Hypercorn / Granian."""
 	USE_HYPERCORN: bool = field(default_factory=lambda: os.getenv("USE_HYPERCORN", "False") in TRUE_VALUES)

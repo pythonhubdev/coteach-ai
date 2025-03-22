@@ -9,7 +9,8 @@ authors = [
 dependencies = [
     "granian>=2.1.2",
     "hypercorn>=0.17.3",
-    "litestar>=2.15.1",
+    "litestar-granian>=0.12.1",
+    "litestar[granian]>=2.15.1",
     "loguru>=0.7.3",
     "python-dotenv>=1.0.1",
 ]
