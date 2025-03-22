@@ -16,7 +16,7 @@ if settings.app.DEBUG:
 else:
 	server_config = [
 		Server(
-			url="https://prodapi.panorah.com",
+			url="https://api.coteach.com",
 			description="Production server",
 		),
 		Server(

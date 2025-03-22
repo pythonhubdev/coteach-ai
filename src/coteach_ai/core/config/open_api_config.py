@@ -7,7 +7,7 @@ from .servers import server_config
 open_api_config = OpenAPIConfig(
 	title=settings.app.NAME,
 	version="1.0",
-	description="API for Panorah",
+	description="API for CoTeach",
 	servers=server_config,
 	render_plugins=[
 		ScalarRenderPlugin(
