@@ -7,7 +7,7 @@ class GranianApplication:
 	"""
 	Custom Granian application.
 
-	This class is used to start Hypercorn with the FastAPI application.
+	This class is used to start Granian with the Litestar application.
 	"""
 
 	@staticmethod

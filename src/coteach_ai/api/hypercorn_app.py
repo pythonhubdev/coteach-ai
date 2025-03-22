@@ -10,7 +10,7 @@ class HypercornApplication:
 	"""
 	Custom Hypercorn application.
 
-	This class is used to start Hypercorn with the FastAPI application.
+	This class is used to start Hypercorn with the Litestar application.
 	"""
 
 	def __init__(
