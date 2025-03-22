@@ -12,7 +12,7 @@ class GranianApplication:
 
 	@staticmethod
 	def run() -> None:
-		"""Run the FastAPI application with Hypercorn."""
+		"""Run the FastAPI application with Granian."""
 		granian_app = Granian(
 			target=settings.server.APP_LOC,
 			interface=Interfaces.ASGI,
