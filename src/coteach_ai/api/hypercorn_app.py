@@ -1,10 +1,9 @@
 import asyncio
 
+from coteach_ai.core import HypercornConfig
 from hypercorn.asyncio import serve
 from litestar import Litestar
 from loguru import logger
-
-from src.panorah_framework.core import HypercornConfig
 
 
 class HypercornApplication:
