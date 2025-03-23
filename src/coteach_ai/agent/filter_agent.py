@@ -14,7 +14,7 @@ class FilterAgent(Agent):
 	def __init__(self, agent_id: str) -> None:
 		super().__init__(agent_id)
 		if not agent_config.llm or not agent_config.search_tool:
-			msg = "AIModel must be initialized with an LLM and search tool before creating ResearchAgent"
+			msg = "AIModel must be initialized with an LLM and search tool before creating FilterAgent"
 			raise DataError(message=msg, status=422)
 		self.filter_agent = create_react_agent(
 			name="filter_agent",
