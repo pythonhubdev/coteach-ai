@@ -100,7 +100,7 @@ class Orchestrator:
 						"video": visuals.get(title, {}).get("video", ""),
 					},
 				}
-				assert combined_output["course"]["module"] is not None
+				assert combined_output["course"]["modules"] is not None
 				assert isinstance(combined_output["course"]["modules"], list)
 				combined_output["course"]["modules"].append(module_dict)
 
