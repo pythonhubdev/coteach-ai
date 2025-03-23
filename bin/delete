@@ -14,7 +14,7 @@ if [ -z "$default_branch" ]; then
 fi
 
 # Delete local branches that are merged into the default branch
-git branch --merged origin/$default_branch | grep -v "^\*" | grep -v "^$default_branch$" | xargs -r git branch -d
+git branch --merged origin/"$default_branch" | grep -v "^\*" | grep -v "^$default_branch$" | xargs -r git branch -d
 
 # Delete local branches that track deleted remote branches
 git branch -vv | grep ': gone]' | awk '{print $1}' | grep -v "^$default_branch$" | xargs -r git branch -D

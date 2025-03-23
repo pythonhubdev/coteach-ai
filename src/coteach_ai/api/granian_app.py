@@ -1,6 +1,7 @@
-from coteach_ai.core import settings
 from granian import Granian
 from granian.constants import Interfaces
+
+from src.coteach_ai.core import settings
 
 
 class GranianApplication:
