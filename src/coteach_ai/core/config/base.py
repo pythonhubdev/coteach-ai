@@ -140,10 +140,46 @@ class ServerSettings:
 
 
 @dataclass
+class AgentSettings:
+	"""Agent configurations."""
+
+	PERPLEXITY_API_KEY: str = field(default_factory=lambda: os.getenv("PERPLEXITY_API_KEY", ""))
+	"""Perplexity API key."""
+
+	OPENAI_API_KEY: str = field(default_factory=lambda: os.getenv("OPENAI_API_KEY", ""))
+	"""OpenAI API key."""
+
+	OPENAI_ORGANIZATION_ID: str = field(default_factory=lambda: os.getenv("OPENAI_ORGANIZATION_ID", ""))
+	"""OpenAI Organization ID."""
+
+	TAVILY_API_KEY: str = field(default_factory=lambda: os.getenv("TAVILY_API_KEY", ""))
+	"""Tavily API key."""
+
+	MODEL: str = field(default_factory=lambda: os.getenv("MODEL", "OpenAI"))
+	"""Model to be used"""
+
+	OPENAI_MODEL: str = field(default_factory=lambda: os.getenv("OPENAI_MODEL", "gpt-4o"))
+	"""Model to be used for OpenAI"""
+
+	PERPLEXITY_MODEL: str = field(default_factory=lambda: os.getenv("PERPLEXITY_MODEL", "sonar-reasoning-pro"))
+	"""Model to be used for Perplexity"""
+
+	MAX_RETRIES: int = field(default_factory=lambda: int(os.getenv("MAX_RETRIES", "3")))
+	"""Maximum number of retries to make when generating."""
+
+	SEARCH_TOOL: str = field(default_factory=lambda: os.getenv("SEARCH_TOOL", "tavily"))
+	"""Search tool to be used"""
+
+	GOOGLE_API_KEY: str = field(default_factory=lambda: os.getenv("GOOGLE_API_KEY", ""))
+	"""Google API key."""
+
+
+@dataclass
 class Settings:
 	app: AppSettings = field(default_factory=AppSettings)
 	server: ServerSettings = field(default_factory=ServerSettings)
 	log: LogSettings = field(default_factory=LogSettings)
+	agent: AgentSettings = field(default_factory=AgentSettings)
 
 	@classmethod
 	def from_env(cls) -> "Settings":

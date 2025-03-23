@@ -1,12 +1,22 @@
 from pathlib import Path
 
-from litestar import Litestar
+from litestar import Litestar, get
 from litestar.static_files import create_static_files_router
 from litestar_granian import GranianPlugin
 from loguru import logger
 
+from src.coteach_ai.api.course.view import CourseGenView
 from src.coteach_ai.api.lifespan import LifeSpan
-from src.coteach_ai.core import Config, settings
+from src.coteach_ai.core import BaseResponseSchema, BaseResponseSchemaDTO, Config, StatusEnum, settings
+from src.coteach_ai.middlewares import LoggingMiddleware
+
+
+@get("/", return_dto=BaseResponseSchemaDTO)
+async def health() -> BaseResponseSchema:
+	return BaseResponseSchema(
+		message="Welcome to CoTeach Course Generation AI API",
+		status=StatusEnum.SUCCESS,
+	)
 
 
 def construct_app() -> Litestar:
@@ -29,8 +39,12 @@ def construct_app() -> Litestar:
 					Path(__file__).parent.parent / "static" / "docs",
 				],
 			),
+			health,
+			CourseGenView,
 		],
-		middleware=[],
+		middleware=[
+			LoggingMiddleware,
+		],
 	)
 
 

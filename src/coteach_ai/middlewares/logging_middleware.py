@@ -1,11 +1,12 @@
 from time import time
 from typing import TYPE_CHECKING
 
-from src.coteach_ai.core.utils.logging import end_stage_logger, stage_logger
 from litestar.datastructures import MutableScopeHeaders
 from litestar.enums import ScopeType
 from litestar.middleware import AbstractMiddleware
 from litestar.types import Receive, Scope, Scopes, Send
+
+from src.coteach_ai.core.utils.logging import end_stage_logger, stage_logger
 
 if TYPE_CHECKING:
 	from litestar.types import Message, Receive, Scope, Send
