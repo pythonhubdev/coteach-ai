@@ -11,14 +11,11 @@ class CourseGenController:
 	@staticmethod
 	async def create_course(request: CourseCreateRequestSchema) -> DataResponseSchema:
 		try:
-			logger.info(f"Generating course for description: {request.course_description}")
-			result = await orchestrator.run(request.course_description)
-			if not result or "course" not in result:
-				msg = "Course generation failed to produce valid output"
-				raise DataError(message=msg, status=500)
-			logger.info("Course generation completed successfully")
+			logger.info(f"Generating course for description: {request.brief}")
+			result = await orchestrator.run(request.brief, request.target_audience)
+			logger.info(f"Course generation completed successfully with result {result}")
 			return DataResponseSchema(
-				data={"course": result["course"]},
+				data=result,
 				message="Course generated successfully",
 				status=StatusEnum.SUCCESS,
 			)

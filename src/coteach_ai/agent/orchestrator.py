@@ -4,6 +4,7 @@ from langchain_core.messages import HumanMessage
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.types import Command
+from loguru import logger
 
 from src.coteach_ai.core import settings
 
@@ -39,71 +40,124 @@ class Orchestrator:
 			update = await visual_agent.run(state)
 			return Command(update=update, goto="combine")
 
-		async def combine_node(state: State) -> Command:  # noqa: C901
-			if not state["organized_content"] or not state["visual_content"]:
-				msg = "State must contain 'organized_content' and 'visual_content' to combine"
-				raise DataError(message=msg, status=422)
+		def combine_node(state: State) -> Command:  # noqa: C901
+			logger.info(f"The current state is {state}")
+			if not state.get("organized_content") or not state.get("visual_content"):
+				raise DataError(
+					message="State must contain 'organized_content' and 'visual_content' to combine",
+					status=422,
+				)
 
-			organized_content = state["organized_content"]
-			visual_content = state["visual_content"]
+			organized_content: str = state.get("organized_content", None) or ""
+			visual_content: str = state.get("visual_content", None) or ""
+			research_summary: str = state.get("research_summary", None) or ""
+			input_content: str | list[str | dict[str, Any]] = state["initial_input"][0].content
+			assert isinstance(input_content, str)
+			unprocessed_brief, unprocessed_target_audience = input_content.split("-")
+			brief = unprocessed_brief.replace("Brief: ", "").strip()
+			target_audience = unprocessed_target_audience.replace("Target Audience: ", "").strip()
 
-			modules: list[dict[str, Any]] = []
-			current_module: dict[str, Any] = {}
+			topic = brief.split(" course")[0].replace("A ", "").capitalize()
+
+			modules = []
+			current_module = None
+			current_lesson = None
+
 			for line in organized_content.split("\n"):
-				_line = line.strip()
-				if _line.startswith("### Module"):
+				leading_tabs = 0
+				while leading_tabs < len(line) and line[leading_tabs] == "\t":
+					leading_tabs += 1
+				remaining_line = line[leading_tabs:].lstrip()
+
+				if leading_tabs == 0 and remaining_line.startswith("- ### "):
 					if current_module:
 						modules.append(current_module)
-					current_module = {"title": _line.replace("### ", "")}
-				elif _line.startswith("- **Learning Objective**:"):
-					current_module["learning_objective"] = _line.replace("- **Learning Objective**: ", "")
-				elif _line.startswith("- **Content**:"):
-					current_module["content"] = _line.replace("- **Content**: ", "")
-				elif _line.startswith("- **Summary**:"):
-					current_module["summary"] = _line.replace("- **Summary**: ", "")
-				elif _line.startswith("- **Suggested Visuals**:"):
-					current_module["suggested_visuals"] = _line.replace("- **Suggested Visuals**: ", "")
-				elif _line and "content" in current_module:
-					current_module["content"] += " " + _line
-			if current_module:
+					current_module = {"title": remaining_line[len("- ### ") :].strip(), "lessons": []}
+					current_lesson = None
+				elif leading_tabs == 1 and remaining_line.startswith("- #### "):
+					if current_module is None:
+						continue
+					if current_lesson:
+						current_module["lessons"].append(current_lesson)
+					current_lesson = {"title": remaining_line[len("- #### ") :].strip(), "content": "", "resources": []}
+				elif leading_tabs == 2 and remaining_line.startswith("- **Content**: "):
+					if current_lesson is not None:
+						current_lesson["content"] = remaining_line[len("- **Content**: ") :].strip()
+				elif leading_tabs == 2 and remaining_line.startswith("- **Resources**: "):
+					if current_lesson is not None:
+						resources = remaining_line[len("- **Resources**: ") :].strip().split(", ")
+						current_lesson["resources"] = resources
+				elif current_lesson and leading_tabs >= 2 and remaining_line:
+					current_lesson["content"] += " " + remaining_line.strip()
+
+			if current_lesson and current_module:
+				current_module["lessons"].append(current_lesson)
+			if current_module and current_module not in modules:
 				modules.append(current_module)
 
 			visuals = {}
 			current_title = None
-			for _line in visual_content.split("\n"):
-				_line = _line.strip()
-				if _line.startswith("### Module"):
-					current_title = _line.replace("### ", "")
-					visuals[current_title] = {"image": "", "video": ""}
-				elif _line.startswith("- **Image**:"):
-					if current_title:
-						visuals[current_title]["image"] = _line.replace("- **Image**: ", "")
-				elif _line.startswith("- **Video**:"):
-					if current_title:
-						visuals[current_title]["video"] = _line.replace("- **Video**: ", "")
+			for line in visual_content.split("\n"):
+				_line = line.strip().strip("\n").strip("\t")
+				if _line.startswith("- **Lesson"):
+					current_title = _line.replace("-", "").strip(" ").strip("*")
+					visuals[current_title] = []
+				elif _line.startswith("- ") and "Lesson" not in _line and current_title:
+					visuals[current_title].append(_line.replace("- ", ""))
 
-			combined_output: dict[str, dict[str, str | list | Any]] = {
-				"course": {
-					"title": state["initial_input"][0].content,
-					"modules": [],
-				},
+			references = []
+			in_references_section = False
+			for line in research_summary.split("\n"):
+				_line = line.strip()
+				if _line.startswith(
+					(
+						"### References",
+						"**References**",
+						"References:",
+						"### References:",
+						"**References**:",
+						"**References:**",
+					),
+				):
+					in_references_section = True
+					continue
+				if in_references_section and _line.startswith("- "):
+					ref = _line.replace("- ", "").strip()
+					sentence, link = ref.split('\\"')
+					sentence.strip('\\"')
+					ref = sentence + link
+					if ref:
+						references.append(ref)
+
+			combined_output = {
+				"course_title": f"Introduction to {topic}",
+				"description": f"A comprehensive introduction to {topic.lower()}, designed for {target_audience.lower()} with no prior knowledge.",
+				"modules": [],
+				"references": references,
 			}
-			for module in modules:
-				title = module["title"]
-				module_dict = {
-					"title": title,
-					"learning_objective": module.get("learning_objective", ""),
-					"content": module.get("content", ""),
-					"summary": module.get("summary", ""),
-					"visuals": {
-						"image": visuals.get(title, {}).get("image", ""),
-						"video": visuals.get(title, {}).get("video", ""),
-					},
-				}
-				assert combined_output["course"]["modules"] is not None
-				assert isinstance(combined_output["course"]["modules"], list)
-				combined_output["course"]["modules"].append(module_dict)
 
+			for module in modules:
+				module_dict = {"title": module["title"], "lessons": []}
+				lesson: dict[str, Any]
+				for i, lesson in enumerate(module["lessons"]):
+					existing_resources = lesson.get("resources", [])
+					resources = (
+						visuals.get(lesson["title"], [])[i : i + 1]
+						if i
+						< len(
+							visuals.get(lesson["title"], []),
+						)
+						else []
+					)
+					lesson_dict = {
+						"title": lesson.get("title", f"Untitled Lesson {i + 1}"),
+						"content": lesson.get("content", ""),
+						"resources": existing_resources + resources if resources else existing_resources,
+					}
+					module_dict["lessons"].append(lesson_dict)
+				combined_output["modules"].append(module_dict)
+
+			logger.debug(f"Final combined output:\n{combined_output}")
 			return Command(update={"final_course": combined_output}, goto=END)
 
 		builder.add_node("researcher", research_node)
@@ -120,10 +174,14 @@ class Orchestrator:
 
 		return builder.compile(debug=settings.app.DEBUG)
 
-	async def run(self, course_description: str) -> dict[str, Any]:
+	async def run(self, brief: str, target_audience: str) -> dict[str, Any]:
 		"""Run the orchestrator to generate a course from a description."""
 		initial_state: State = {
-			"initial_input": [HumanMessage(content=course_description)],
+			"initial_input": [
+				HumanMessage(
+					content=f"Brief: {brief} - Target Audience: {target_audience}",
+				),
+			],
 			"research_summary": None,
 			"filtered_modules": None,
 			"organized_content": None,
