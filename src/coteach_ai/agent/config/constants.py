@@ -9,4 +9,4 @@ class State(TypedDict):
 	filtered_modules: str | None
 	organized_content: str | None
 	visual_content: str | None
-	final_course: list[dict[str, Any]] | None
+	final_course: dict[str, Any] | None
