@@ -1,7 +1,7 @@
 from time import time
 from typing import TYPE_CHECKING
 
-from coteach_ai.core.utils.logging import end_stage_logger, stage_logger
+from src.coteach_ai.core.utils.logging import end_stage_logger, stage_logger
 from litestar.datastructures import MutableScopeHeaders
 from litestar.enums import ScopeType
 from litestar.middleware import AbstractMiddleware
@@ -19,8 +19,8 @@ class LoggingMiddleware(AbstractMiddleware):
 
 		if scope["type"] == ScopeType.HTTP and scope.get("client"):
 			stage_logger.info(
-					f'{scope["client"][0]}:{scope["client"][1]} - "{scope["method"]} {scope["path"]} '  # type: ignore
-					f'{scope["http_version"]}"',
+				f'{scope["client"][0]}:{scope["client"][1]} - "{scope["method"]} {scope["path"]} '  # type: ignore
+				f'{scope["http_version"]}"',
 			)
 
 		async def send_wrapper(message: "Message") -> None:
@@ -31,9 +31,9 @@ class LoggingMiddleware(AbstractMiddleware):
 
 				if scope.get("client"):
 					end_stage_logger.info(
-							f'{scope["client"][0]}:{scope["client"][1]} - "{scope["method"]} '  # type: ignore
-							f'{scope["path"]} '  # type: ignore
-							f'{scope["http_version"]}" {message["status"]}',
+						f'{scope["client"][0]}:{scope["client"][1]} - "{scope["method"]} '  # type: ignore
+						f"{scope['path']} "  # type: ignore
+						f'{scope["http_version"]}" {message["status"]}',
 					)
 			await send(message)
 

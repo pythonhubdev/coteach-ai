@@ -1,10 +1,11 @@
 from pathlib import Path
 
-from coteach_ai.api.lifespan import LifeSpan
-from coteach_ai.core import Config, settings
 from litestar import Litestar
 from litestar.static_files import create_static_files_router
 from litestar_granian import GranianPlugin
+
+from src.coteach_ai.api.lifespan import LifeSpan
+from src.coteach_ai.core import Config, settings
 
 
 def construct_app() -> Litestar:
