@@ -78,7 +78,7 @@ development = [
 requires-dist = [
     { name = "granian", specifier = ">=2.1.2" },
     { name = "hypercorn", specifier = ">=0.17.3" },
-    { name = "litestar", extras = ["granian"], specifier = ">=2.15.1" },
+    { name = "litestar", specifier = ">=2.15.1" },
     { name = "litestar-granian", specifier = ">=0.12.1" },
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
