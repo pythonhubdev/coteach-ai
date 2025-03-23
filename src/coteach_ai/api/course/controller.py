@@ -34,7 +34,7 @@ class CourseGenController:
 		except Exception as exception:  # noqa: BLE001
 			logger.error(f"Unknown error occurred: {exception}")
 			return DataResponseSchema(
-				message="Unknown error occurred",
+				message="Unknown error occurred! Please try again sometimes the LLMs might not provide expected results",
 				status=StatusEnum.ERROR,
 				error=str(exception),
 			)
