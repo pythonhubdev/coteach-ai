@@ -15,7 +15,7 @@ class OrganizerAgent(Agent):
 	def __init__(self, agent_id: str):
 		super().__init__(agent_id)
 		if not agent_config.llm or not agent_config.search_tool:
-			msg = "AIModel must be initialized with an LLM and search tool before creating ResearchAgent"
+			msg = "AIModel must be initialized with an LLM and search tool before creating OrganizerAgent"
 			raise InitializationError(
 				message=msg,
 				status=502,
