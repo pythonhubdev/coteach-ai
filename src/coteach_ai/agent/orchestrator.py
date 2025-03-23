@@ -53,6 +53,11 @@ class Orchestrator:
 			research_summary: str = state.get("research_summary", None) or ""
 			input_content: str | list[str | dict[str, Any]] = state["initial_input"][0].content
 			assert isinstance(input_content, str)
+			if input_content.count("-") != 1:
+				raise DataError(
+					message="Input content must contain exactly one hyphen to separate brief and target audience",
+					status=422,
+				)
 			unprocessed_brief, unprocessed_target_audience = input_content.split("-")
 			brief = unprocessed_brief.replace("Brief: ", "").strip()
 			target_audience = unprocessed_target_audience.replace("Target Audience: ", "").strip()
