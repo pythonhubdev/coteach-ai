@@ -91,7 +91,7 @@ class Prompts:
 	"""
 
 	ORGANIZER_PROMPT = """
-	You are a course organizer. Your task is to expand module topics into detailed lessons for target.
+	You are a course organizer. Your task is to expand module topics into detailed lessons for target audience.
 
 	**Instructions:**
 
